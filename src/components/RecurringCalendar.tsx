@@ -78,8 +78,15 @@ export default function RecurringCalendar({
 
   const colors = colorMap[variant];
 
-  // Items for the selected day
-  const selectedDayItems = selectedDay ? itemsByDay.get(selectedDay) || [] : [];
+  // Sorted days that have items
+  const sortedDays = Array.from(itemsByDay.keys()).sort((a, b) => a - b);
+
+  // For past/today styling
+  const now = new Date();
+  const isCurrentMonth = now.getFullYear() === viewMonth.getFullYear() && now.getMonth() === viewMonth.getMonth();
+  const isPastMonth = viewMonth.getFullYear() < now.getFullYear() || (viewMonth.getFullYear() === now.getFullYear() && viewMonth.getMonth() < now.getMonth());
+  const today = now.getDate();
+  const currentMonthStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
 
   // The currently "selected" date for react-day-picker
   const selectedDate = selectedDay
@@ -175,76 +182,100 @@ export default function RecurringCalendar({
         />
       </div>
 
-      {/* Selected day detail panel */}
-      {selectedDay && (
-        <div className="flex-1 rounded-2xl border border-slate-100 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900">
-          <h4 className="mb-3 text-sm font-semibold text-slate-900 dark:text-slate-100">
-            {ordinal(selectedDay)} of each month
-          </h4>
-          {selectedDayItems.length === 0 ? (
-            <p className="text-sm text-slate-400 dark:text-slate-500">
-              No items scheduled on this day
-            </p>
-          ) : (
-            <div className="space-y-2">
-              {selectedDayItems.map((item) => (
-                <div
-                  key={item.id}
-                  className={`flex items-center justify-between rounded-xl border p-3 ${
-                    item.active
-                      ? "border-slate-100 dark:border-slate-800"
-                      : "border-slate-100 opacity-50 dark:border-slate-800"
-                  }`}
-                >
-                  <div>
-                    <p className="text-sm font-medium text-slate-900 dark:text-slate-100">
-                      {item.name}
-                    </p>
-                    <p className="text-xs text-slate-400 dark:text-slate-500">
-                      {item.accountName}
-                      {item.category ? ` · ${item.category}` : ""}
-                      {item.lastProcessed ? ` · Last: ${item.lastProcessed}` : ""}
-                    </p>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className={`text-sm font-bold ${colors.amount}`}>
-                      {colors.prefix}{formatCurrency(item.amount)}
+      {/* Month summary panel — always visible */}
+      <div className="flex-1 rounded-2xl border border-slate-100 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+        <h4 className="mb-3 text-sm font-semibold text-slate-900 dark:text-slate-100">
+          {viewMonth.toLocaleDateString("en-US", { month: "long" })} Summary
+        </h4>
+        {sortedDays.length === 0 ? (
+          <p className="text-sm text-slate-400 dark:text-slate-500">
+            No items this month
+          </p>
+        ) : (
+          <div className="space-y-1.5 max-h-[400px] overflow-y-auto">
+            {sortedDays.map((day) => {
+              const dayItems = itemsByDay.get(day)!;
+              const isPast = isPastMonth || (isCurrentMonth && day < today);
+              const isToday = isCurrentMonth && day === today;
+
+              return (
+                <div key={day}>
+                  <div className={`flex items-center gap-2 px-2 py-1 ${isToday ? "rounded-lg bg-slate-100 dark:bg-slate-800" : ""}`}>
+                    <span className={`text-xs font-semibold w-8 ${isPast ? "text-slate-400 dark:text-slate-500" : isToday ? "text-slate-900 dark:text-slate-100" : colors.badge}`}>
+                      {ordinal(day)}
                     </span>
-                    {onToggleItem && (
-                      <button
-                        onClick={() => onToggleItem(item.id)}
-                        className={`rounded-lg px-2 py-1 text-xs font-medium transition-colors ${
-                          item.active
-                            ? "text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800"
-                            : "text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-950"
-                        }`}
-                      >
-                        {item.active ? "Pause" : "Resume"}
-                      </button>
-                    )}
-                    {onEditItem && (
-                      <button
-                        onClick={() => onEditItem(item.id)}
-                        className="rounded-lg px-2 py-1 text-xs font-medium text-slate-500 transition-colors hover:bg-slate-100 dark:hover:bg-slate-800"
-                      >
-                        Edit
-                      </button>
-                    )}
-                    {onDeleteItem && (
-                      <button
-                        onClick={() => onDeleteItem(item.id)}
-                        className="rounded-lg px-2 py-1 text-xs font-medium text-rose-500 transition-colors hover:bg-rose-50 dark:hover:bg-rose-950"
-                      >
-                        Delete
-                      </button>
-                    )}
+                    <div className="flex-1 space-y-1">
+                      {dayItems.map((item) => {
+                        const wasProcessed = item.lastProcessed === currentMonthStr && isPast;
+
+                        return (
+                        <div
+                          key={item.id}
+                          className={`flex items-center justify-between rounded-lg border px-3 py-2 ${
+                            !item.active
+                              ? "border-slate-100 opacity-50 dark:border-slate-800"
+                              : isPast
+                                ? "border-slate-100 bg-slate-50/50 dark:border-slate-800 dark:bg-slate-800/30"
+                                : "border-slate-100 dark:border-slate-800"
+                          }`}
+                        >
+                          <div className="flex items-center gap-2">
+                            <div className={`h-2 w-2 rounded-full ${item.active ? colors.dot : "bg-slate-300 dark:bg-slate-600"}`} />
+                            <div>
+                              <p className={`text-sm font-medium ${isPast ? "text-slate-400 dark:text-slate-500" : "text-slate-900 dark:text-slate-100"}`}>
+                                {item.name}
+                              </p>
+                              <p className="text-xs text-slate-400 dark:text-slate-500">
+                                {item.accountName}
+                                {item.category ? ` · ${item.category}` : ""}
+                                {wasProcessed && " · Processed"}
+                              </p>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-1.5">
+                            <span className={`text-sm font-bold ${isPast ? "text-slate-400 dark:text-slate-500" : colors.amount}`}>
+                              {colors.prefix}{formatCurrency(item.amount)}
+                            </span>
+                            {!isPast && onToggleItem && (
+                              <button
+                                onClick={() => onToggleItem(item.id)}
+                                className={`rounded-lg px-1.5 py-0.5 text-xs font-medium transition-colors ${
+                                  item.active
+                                    ? "text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800"
+                                    : "text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-950"
+                                }`}
+                              >
+                                {item.active ? "Pause" : "Resume"}
+                              </button>
+                            )}
+                            {!isPast && onEditItem && (
+                              <button
+                                onClick={() => onEditItem(item.id)}
+                                className="rounded-lg px-1.5 py-0.5 text-xs font-medium text-slate-500 transition-colors hover:bg-slate-100 dark:hover:bg-slate-800"
+                              >
+                                Edit
+                              </button>
+                            )}
+                            {!isPast && onDeleteItem && (
+                              <button
+                                onClick={() => onDeleteItem(item.id)}
+                                className="rounded-lg px-1.5 py-0.5 text-xs font-medium text-rose-500 transition-colors hover:bg-rose-50 dark:hover:bg-rose-950"
+                              >
+                                Delete
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                        );
+                      })}
+                    </div>
                   </div>
                 </div>
-              ))}
-            </div>
-          )}
-        </div>
-      )}
+              );
+            })}
+          </div>
+        )}
+      </div>
     </div>
   );
 }

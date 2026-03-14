@@ -8,7 +8,7 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params;
-  const body = await request.json();
+  const { lastProcessed, createdAt, id: _id, ...body } = await request.json();
   const updated = await db
     .update(recurringIncome)
     .set({ ...body, updatedAt: new Date() })
