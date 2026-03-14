@@ -1,0 +1,27 @@
+{
+  "version": "7",
+  "dialect": "sqlite",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "6",
+      "when": 1773417183949,
+      "tag": "0000_fluffy_marauders",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1773433990868,
+      "tag": "0001_nosy_wolverine",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1773437269791,
+      "tag": "0002_moaning_moonstone",
+      "breakpoints": true
+    }
+  ]
+}

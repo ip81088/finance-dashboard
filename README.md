@@ -1,36 +1,81 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# FinanceHub
 
-## Getting Started
+Personal finance dashboard for tracking accounts, recurring income/expenses, transactions, and financial goals. Built with Next.js, SQLite, and Drizzle ORM. Deployed on Kubernetes via k3d.
 
-First, run the development server:
+## Tech Stack
+
+- **Frontend**: Next.js 16 (App Router), TypeScript, Tailwind CSS v4, Recharts
+- **Backend**: Next.js API routes, SQLite (better-sqlite3), Drizzle ORM
+- **Infrastructure**: k3d (k3s in Docker), OrbStack, multi-stage Docker build
+- **Currency**: ILS (Israeli New Shekel)
+
+## Features
+
+- Net worth overview with asset/debt breakdown
+- Multiple account types (main, savings, investment, debt)
+- Recurring monthly income and expenses (auto-processed)
+- Transaction tracking with spending-by-category charts
+- Financial goals tracker
+- Dark mode support
+
+## Deploy to Kubernetes
+
+Prerequisites: [OrbStack](https://orbstack.dev/) (or Docker Desktop) and [k3d](https://k3d.io/) installed.
+
+**One-command deploy:**
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+./deploy/deploy.sh
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+This creates a k3d cluster, builds the Docker image, imports it, and applies all manifests. The app will be available at `http://localhost:8080`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+**Manual steps:**
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+# Create cluster
+k3d cluster create finance-dashboard -p "8080:80@loadbalancer"
 
-## Learn More
+# Build and import image
+docker build -f deploy/Dockerfile -t finance-dashboard:v12 .
+k3d image import finance-dashboard:v12 -c finance-dashboard
 
-To learn more about Next.js, take a look at the following resources:
+# Apply manifests
+kubectl apply -f deploy/manifests/
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+# Check status
+kubectl -n finance get pods
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+**Stop/Start:**
 
-## Deploy on Vercel
+```bash
+k3d cluster stop finance-dashboard
+k3d cluster start finance-dashboard
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Local Development
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```bash
+npm install
+npm run dev
+```
+
+Open `http://localhost:3000`.
+
+## Project Structure
+
+```
+src/
+  app/           # Next.js pages and API routes
+  components/    # React components
+  db/            # Schema, migrations, DB connection
+  lib/           # Utilities
+deploy/
+  Dockerfile     # Multi-stage production build
+  manifests/     # Kubernetes manifests (deployment, service, ingress, PVC)
+  init-db.mjs    # Migration runner with tracking
+  deploy.sh      # One-command deployment script
+  K8S_GUIDE.md   # Kubernetes learning guide
+drizzle/         # SQL migration files
+```
