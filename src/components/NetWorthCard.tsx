@@ -13,9 +13,12 @@ export default function NetWorthCard({ accounts }: NetWorthCardProps) {
     .filter((a) => a.balance > 0)
     .reduce((sum, a) => sum + a.balance, 0);
 
-  const debtAccounts = accounts.filter((a) => a.balance < 0);
-  const totalDebts = debtAccounts.reduce((sum, a) => sum + Math.abs(a.balance), 0);
-  const totalCreditLimit = debtAccounts.reduce((sum, a) => sum + (a.creditLimit || 0), 0);
+  const totalDebts = accounts
+    .filter((a) => a.balance < 0)
+    .reduce((sum, a) => sum + Math.abs(a.balance), 0);
+  const totalCreditLimit = accounts
+    .filter((a) => a.balance < 0)
+    .reduce((sum, a) => sum + (a.creditLimit || 0), 0);
 
   const netWorth = totalAssets - totalDebts;
 
@@ -49,14 +52,15 @@ export default function NetWorthCard({ accounts }: NetWorthCardProps) {
                 Total Debts
               </span>
             </div>
-            <p className="mt-1 text-lg font-semibold">
-              {formatCurrency(totalDebts)}
-              {totalCreditLimit > 0 && (
-                <span className="text-sm font-normal text-indigo-200">
-                  /{formatCurrency(totalCreditLimit)}
-                </span>
-              )}
-            </p>
+            {totalCreditLimit > 0 ? (
+              <p className="mt-1 text-lg font-semibold" dir="ltr">
+                {`\u200E${formatCurrency(totalDebts)}\u200E / \u200E${formatCurrency(totalCreditLimit)}`}
+              </p>
+            ) : (
+              <p className="mt-1 text-lg font-semibold">
+                {formatCurrency(totalDebts)}
+              </p>
+            )}
           </div>
         </div>
       </div>

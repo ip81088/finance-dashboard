@@ -50,7 +50,7 @@ export default function AddAccountModal({
           balance: parseFloat(balance) || 0,
           institution: institution || null,
           accountNumber: accountNumber || null,
-          creditLimit: type === "debt" && creditLimit ? parseFloat(creditLimit) : null,
+          creditLimit: creditLimit ? parseFloat(creditLimit) : null,
           color,
         }),
       });
@@ -111,22 +111,20 @@ export default function AddAccountModal({
           />
         </div>
 
-        {type === "debt" && (
-          <div>
-            <label className="mb-1 block text-sm font-medium text-slate-700 dark:text-slate-300">
-              Credit Limit
-            </label>
-            <input
-              type="number"
-              step="0.01"
-              min="0"
-              value={creditLimit}
-              onChange={(e) => setCreditLimit(e.target.value)}
-              placeholder="e.g., 35000"
-              className={inputClass}
-            />
-          </div>
-        )}
+        <div>
+          <label className="mb-1 block text-sm font-medium text-slate-700 dark:text-slate-300">
+            Credit Limit
+          </label>
+          <input
+            type="number"
+            step="0.01"
+            min="0"
+            value={creditLimit}
+            onChange={(e) => setCreditLimit(e.target.value)}
+            placeholder="e.g., 35000"
+            className={inputClass}
+          />
+        </div>
 
         <div className="grid grid-cols-2 gap-4">
           <div>

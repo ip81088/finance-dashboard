@@ -84,7 +84,7 @@ export default function AccountsOverview({
         balance: parseFloat(editBalance) || 0,
         institution: editInstitution || null,
         accountNumber: editAccountNumber || null,
-        creditLimit: editType === "debt" && editCreditLimit ? parseFloat(editCreditLimit) : null,
+        creditLimit: editCreditLimit ? parseFloat(editCreditLimit) : null,
         color: editColor,
       });
       setShowEdit(false);
@@ -154,7 +154,7 @@ export default function AccountsOverview({
                     </span>
                   )}
                 </p>
-                {account.type === "debt" && account.creditLimit && (
+                {account.creditLimit && (
                   <p className="mt-0.5 text-xs text-slate-400 dark:text-slate-500">
                     of {formatCurrency(account.creditLimit)} limit
                   </p>
@@ -166,9 +166,6 @@ export default function AccountsOverview({
                   {account.institution}
                 </span>
                 <div className="flex items-center gap-2">
-                  <span className="text-xs text-slate-400 dark:text-slate-500">
-                    ****{account.accountNumber}
-                  </span>
                   {onEditAccount && (
                     <button
                       onClick={() => startEdit(account)}
@@ -223,22 +220,20 @@ export default function AccountsOverview({
             <input type="number" step="0.01" value={editBalance} onChange={(e) => setEditBalance(e.target.value)} className={inputClass} />
           </div>
 
-          {editType === "debt" && (
-            <div>
-              <label className="mb-1 block text-sm font-medium text-slate-700 dark:text-slate-300">
-                Credit Limit
-              </label>
-              <input
-                type="number"
-                step="0.01"
-                min="0"
-                value={editCreditLimit}
-                onChange={(e) => setEditCreditLimit(e.target.value)}
-                placeholder="e.g., 35000"
-                className={inputClass}
-              />
-            </div>
-          )}
+          <div>
+            <label className="mb-1 block text-sm font-medium text-slate-700 dark:text-slate-300">
+              Credit Limit
+            </label>
+            <input
+              type="number"
+              step="0.01"
+              min="0"
+              value={editCreditLimit}
+              onChange={(e) => setEditCreditLimit(e.target.value)}
+              placeholder="e.g., 35000"
+              className={inputClass}
+            />
+          </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div>

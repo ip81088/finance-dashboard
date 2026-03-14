@@ -87,8 +87,8 @@ export default function RecurringCalendar({
     : undefined;
 
   return (
-    <div>
-      <div className="rounded-2xl border border-slate-100 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+    <div className="flex gap-4 items-start">
+      <div className="inline-block rounded-2xl border border-slate-100 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900">
         <DayPicker
           mode="single"
           month={viewMonth}
@@ -105,9 +105,9 @@ export default function RecurringCalendar({
             hasItems: datesWithItems,
           }}
           classNames={{
-            root: "w-full",
-            months: "w-full",
-            month: "w-full",
+            root: "",
+            months: "",
+            month: "",
             month_caption: "flex justify-center mb-3",
             caption_label: "text-sm font-semibold text-slate-900 dark:text-slate-100",
             weekdays: "grid grid-cols-7 mb-1",
@@ -177,7 +177,7 @@ export default function RecurringCalendar({
 
       {/* Selected day detail panel */}
       {selectedDay && (
-        <div className="mt-4 rounded-2xl border border-slate-100 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+        <div className="flex-1 rounded-2xl border border-slate-100 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900">
           <h4 className="mb-3 text-sm font-semibold text-slate-900 dark:text-slate-100">
             {ordinal(selectedDay)} of each month
           </h4>

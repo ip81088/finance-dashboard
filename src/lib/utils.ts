@@ -10,7 +10,7 @@ export function formatCurrency(amount: number): string {
     style: "currency",
     currency: "ILS",
     minimumFractionDigits: 2,
-  }).format(amount);
+  }).format(amount).trim();
 }
 
 export function formatDate(dateStr: string): string {

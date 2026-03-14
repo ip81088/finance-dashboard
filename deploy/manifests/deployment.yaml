@@ -19,7 +19,7 @@ spec:
     spec:
       containers:
         - name: finance-dashboard
-          image: finance-dashboard:v17
+          image: finance-dashboard:v23
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 3000
