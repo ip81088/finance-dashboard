@@ -7,6 +7,7 @@ import StatCards from "@/components/StatCards";
 import AccountsOverview from "@/components/AccountsOverview";
 import TransactionList from "@/components/TransactionList";
 import SpendingChart from "@/components/SpendingChart";
+import IncomeSpendingChart from "@/components/IncomeSpendingChart";
 import GoalsTracker from "@/components/GoalsTracker";
 import AddAccountModal from "@/components/AddAccountModal";
 import AddTransactionModal from "@/components/AddTransactionModal";
@@ -177,9 +178,7 @@ export default function Dashboard() {
               <StatCards transactions={transactions} />
             </div>
 
-            <AccountsOverview accounts={accounts} />
-
-            <SpendingChart transactions={transactions} />
+            <IncomeSpendingChart accounts={accounts} transactions={transactions} />
           </div>
         );
     }

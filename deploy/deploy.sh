@@ -50,7 +50,7 @@ kubectl apply -f deploy/manifests/namespace.yaml
 kubectl apply -f deploy/manifests/pvc.yaml
 
 # Apply deployment with correct image tag
-sed "s|finance-dashboard:v2|finance-dashboard:$IMAGE_TAG|" deploy/manifests/deployment.yaml | kubectl apply -f -
+sed "s|finance-dashboard:[^ ]*|finance-dashboard:$IMAGE_TAG|" deploy/manifests/deployment.yaml | kubectl apply -f -
 
 kubectl apply -f deploy/manifests/service.yaml
 kubectl apply -f deploy/manifests/ingress.yaml
