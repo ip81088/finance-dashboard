@@ -13,18 +13,10 @@ interface AddTransactionModalProps {
 }
 
 const categories = [
-  "Food & Dining",
-  "Shopping",
-  "Transportation",
-  "Entertainment",
-  "Bills & Utilities",
-  "Healthcare",
+  "Credit Card Payment",
   "Income",
   "Transfer",
   "Education",
-  "Travel",
-  "Personal Care",
-  "Other",
 ];
 
 const inputClass =
@@ -75,7 +67,7 @@ export default function AddTransactionModal({
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title={defaultType === "credit" ? "Add Funds" : "Send Money"}
+      title={defaultType === "credit" ? "Add Funds" : "Transaction"}
     >
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>

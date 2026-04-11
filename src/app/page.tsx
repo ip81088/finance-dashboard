@@ -164,18 +164,19 @@ export default function Dashboard() {
           <div className="space-y-6">
             <NetWorthCard accounts={accounts} />
 
-            <div className="grid gap-4 lg:grid-cols-3">
+            <div className="grid gap-4 lg:grid-cols-2">
               <RecurringIncome
                 items={recurringItems}
                 accounts={accounts}
+                transactions={transactions}
                 readOnly
               />
               <RecurringExpenses
                 items={recurringExpenseItems}
                 accounts={accounts}
+                transactions={transactions}
                 readOnly
               />
-              <StatCards transactions={transactions} />
             </div>
 
             <IncomeSpendingChart accounts={accounts} transactions={transactions} />

@@ -14,11 +14,12 @@ import { DayPicker as RDayPicker } from "react-day-picker";
 import { setDate } from "date-fns";
 import Modal from "./Modal";
 import RecurringCalendar from "./RecurringCalendar";
-import type { RecurringExpense, Account } from "@/db/schema";
+import type { RecurringExpense, Account, Transaction } from "@/db/schema";
 
 interface RecurringExpensesProps {
   items: RecurringExpense[];
   accounts: Account[];
+  transactions?: Transaction[];
   onUpdate?: () => void;
   readOnly?: boolean;
 }
@@ -40,6 +41,7 @@ const categories = [
 export default function RecurringExpenses({
   items,
   accounts,
+  transactions = [],
   onUpdate,
   readOnly = false,
 }: RecurringExpensesProps) {
@@ -146,7 +148,24 @@ export default function RecurringExpenses({
   };
 
   if (readOnly) {
-    const totalRecurring = items.filter((i) => i.active).reduce((sum, i) => sum + i.amount, 0);
+    const now = new Date();
+    const thisMonth = now.getMonth();
+    const thisYear = now.getFullYear();
+
+    // All debit transactions this month (includes both processed recurring and one-time)
+    const monthlyDebits = transactions.filter((t) => {
+      const d = new Date(t.date);
+      return t.type === "debit" && t.category !== "Transfer" && d.getMonth() === thisMonth && d.getFullYear() === thisYear;
+    });
+    const totalFromTransactions = monthlyDebits.reduce((sum, t) => sum + t.amount, 0);
+
+    // Recurring that haven't been processed yet this month (pending)
+    const currentMonthKey = `${thisYear}-${String(thisMonth + 1).padStart(2, "0")}`;
+    const pendingRecurring = items.filter((i) => i.active && i.lastProcessed !== currentMonthKey);
+    const pendingAmount = pendingRecurring.reduce((sum, i) => sum + i.amount, 0);
+
+    const total = totalFromTransactions + pendingAmount;
+
     return (
       <div className="rounded-2xl border border-slate-100 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900">
         <div className="mb-3 flex items-center gap-2">
@@ -158,13 +177,20 @@ export default function RecurringExpenses({
           </p>
         </div>
         <p className="text-2xl font-bold text-rose-600 dark:text-rose-400">
-          -{formatCurrency(totalRecurring)}
+          -{formatCurrency(total)}
         </p>
-        {items.length > 0 && (
-          <p className="mt-2 text-xs text-slate-400 dark:text-slate-500">
-            {items.filter((i) => i.active).length} active expense{items.filter((i) => i.active).length !== 1 ? "s" : ""}
-          </p>
-        )}
+        <div className="mt-2 space-y-0.5">
+          {monthlyDebits.length > 0 && (
+            <p className="text-xs text-slate-400 dark:text-slate-500">
+              {formatCurrency(totalFromTransactions)} spent ({monthlyDebits.length} transaction{monthlyDebits.length !== 1 ? "s" : ""})
+            </p>
+          )}
+          {pendingRecurring.length > 0 && (
+            <p className="text-xs text-slate-400 dark:text-slate-500">
+              {formatCurrency(pendingAmount)} pending ({pendingRecurring.length} upcoming)
+            </p>
+          )}
+        </div>
       </div>
     );
   }
