@@ -30,10 +30,9 @@ const inputClass =
 const categories = [
   "Bills & Utilities",
   "Rent",
+  "Investments",
   "Insurance",
   "Subscriptions",
-  "Transportation",
-  "Healthcare",
   "Education",
   "Other",
 ];
